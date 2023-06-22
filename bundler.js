@@ -45,6 +45,21 @@ function buildDepsTree(entry) {
   }
   return queue;
 }
-function bundle() {}
+function bundle(tree) {
+  let modules = "";
+  tree.forEach((node) => {
+    modules += `${node.ID}: [
+      function(require,module,exports) {
+        ${node.code}
+      }
+    ]`;
+  });
+  const result = `
+    (function() {
+
+    })({${modules}})
+  `;
+  return result;
+}
 const tree = buildDepsTree("./src/entry.js");
-console.log(JSON.stringify(tree, null, 3));
+console.log(bundle(tree));

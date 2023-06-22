@@ -48,16 +48,25 @@ function buildDepsTree(entry) {
 function bundle(tree) {
   let modules = "";
   tree.forEach((node) => {
-    modules += `${node.ID}: [
+    modules += `${node.id}: [
       function(require,module,exports) {
         ${node.code}
       },
-      {${JSON.stringify(node.mapping)}}
-    ]`;
+      ${JSON.stringify(node.mapping)}
+    ],`;
   });
   const result = `
-    (function() {
-
+    (function(mapping) {
+      function require(id) {
+        const [fn, mp] = mapping[id];
+        function localRequire(relativePath) {
+          return require(mp[relativePath]);
+        }
+        const module = { exports: {} };
+        fn(localRequire, module, module.exports);
+        return module.exports;
+      }
+      require(0);
     })({${modules}})
   `;
   return result;

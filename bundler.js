@@ -39,7 +39,6 @@ function buildDepsTree(entry) {
       const absolutePath = path.join(dirname, relativePath);
       const childAsset = createAsset(absolutePath);
       asset.mapping[relativePath] = childAsset.id;
-      //console.log({ childAsset });
       queue.push(childAsset);
     });
   }

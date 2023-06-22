@@ -51,7 +51,8 @@ function bundle(tree) {
     modules += `${node.ID}: [
       function(require,module,exports) {
         ${node.code}
-      }
+      },
+      {${JSON.stringify(node.mapping)}}
     ]`;
   });
   const result = `

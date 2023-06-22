@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const babelParser = require("@babel/parser");
 const traverse = require("@babel/traverse").default;
-
+const babel = require("@babel/core");
 let ID = 0;
 
 function createAsset(filename) {
@@ -17,17 +17,21 @@ function createAsset(filename) {
     },
   });
   const id = ID++;
+  const { code } = babel.transformFromAst(ast, null, {
+    presets: ["@babel/preset-env"],
+  });
   return {
     id,
     filename,
     dependencies,
+    code,
   };
 }
 
 function buildDepsTree(entry) {
   const mainAsset = createAsset(entry);
   const queue = [mainAsset];
-  queue.forEach((asset) => {
+  for (const asset of queue) {
     const dirname = path.dirname(asset.filename);
     // save dependencies to its path
     asset.mapping = {};
@@ -35,11 +39,12 @@ function buildDepsTree(entry) {
       const absolutePath = path.join(dirname, relativePath);
       const childAsset = createAsset(absolutePath);
       asset.mapping[relativePath] = childAsset.id;
+      //console.log({ childAsset });
       queue.push(childAsset);
     });
-  });
+  }
   return queue;
 }
-
+function bundle() {}
 const tree = buildDepsTree("./src/entry.js");
 console.log(JSON.stringify(tree, null, 3));

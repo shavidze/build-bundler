@@ -55,11 +55,11 @@ function bundle(tree) {
     ],`;
   });
   const result = `
-    (function(mapping) {
+    (function(modules) {
       function require(id) {
-        const [fn, mp] = mapping[id];
+        const [fn, mapping] = modules[id];
         function localRequire(relativePath) {
-          return require(mp[relativePath]);
+          return require(mapping[relativePath]);
         }
         const module = { exports: {} };
         fn(localRequire, module, module.exports);
